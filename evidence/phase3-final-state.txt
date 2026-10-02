@@ -1,0 +1,7 @@
+﻿Verified 2026-10-02T22:35:42.2204859+05:30
+android.permission.POST_NOTIFICATIONS: granted=false, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+airplane_mode_on=0
+Wifi is enabled
+live_probe_database_absent=True
+personal_database_present=True
+Normal MainActivity relaunched after successful fixture cleanup.

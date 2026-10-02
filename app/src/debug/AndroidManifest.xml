@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity android:name=".probe.FocusProbeActivity" android:exported="true" android:label="BETTER timer test" android:launchMode="singleTop" />
+        <activity android:name=".probe.ReminderProbeActivity" android:exported="true" android:label="BETTER reminder test" android:launchMode="singleTop" />
+        <receiver android:name=".probe.ReminderProbeReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

@@ -1,0 +1,119 @@
+{
+  "synthetic_fixture_only": true,
+  "focus_sessions": [
+    {
+      "id": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "activity": "Portfolio/project",
+      "company": "Synthetic fixture",
+      "role": "Timer test",
+      "rescue": 0,
+      "continued": 0,
+      "state": "COMPLETED",
+      "owner": "11307e92-3c3b-4d5c-924f-e40b71f67534",
+      "createdAt": 1790962405477,
+      "endedAt": 1790963088432,
+      "recovery": ""
+    },
+    {
+      "id": "6d9a0de5-f22d-47b9-8679-aedc3fc4c6fc",
+      "activity": "Portfolio/project",
+      "company": "Synthetic fixture",
+      "role": "Timer test",
+      "rescue": 0,
+      "continued": 0,
+      "state": "RUNNING",
+      "owner": "30dd412a-436b-42a4-8552-1d7f2deec445",
+      "createdAt": 1790963162561,
+      "endedAt": null,
+      "recovery": ""
+    }
+  ],
+  "focus_segments": [
+    {
+      "id": "33dab891-d9af-460d-b30a-f44da9b7c7a9",
+      "sessionId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startWall": 1790962405479,
+      "startElapsed": 2462372,
+      "boot": 74,
+      "zoneId": "Asia/Kolkata",
+      "boundary": "04:00",
+      "durationMillis": 368838,
+      "closed": 1,
+      "candidateMillis": null
+    },
+    {
+      "id": "bcfa95fb-c2bc-434c-be37-739d3b390132",
+      "sessionId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startWall": 1790963076595,
+      "startElapsed": 3133488,
+      "boot": 74,
+      "zoneId": "Asia/Kolkata",
+      "boundary": "04:00",
+      "durationMillis": 11836,
+      "closed": 1,
+      "candidateMillis": null
+    },
+    {
+      "id": "978a4b4b-6e7c-4fdd-9f7c-79f258d4ad92",
+      "sessionId": "6d9a0de5-f22d-47b9-8679-aedc3fc4c6fc",
+      "startWall": 1790963162562,
+      "startElapsed": 3219456,
+      "boot": 74,
+      "zoneId": "Asia/Kolkata",
+      "boundary": "04:00",
+      "durationMillis": 20798,
+      "closed": 0,
+      "candidateMillis": null
+    }
+  ],
+  "action_log": [
+    {
+      "id": "36ba0672-a224-4d91-9e41-0b9d195956f3",
+      "entity": "AppSettings",
+      "entityId": "caa2f6f2-02f0-4c62-a23b-e2ab62b3025e",
+      "action": "ONBOARD",
+      "summary": "Local profile created; Career standard 30 minutes; day begins 04:00; timezone Asia/Kolkata",
+      "timestamp": 1790962405463
+    },
+    {
+      "id": "b33ad0a1-c4b9-41c6-ae33-66221ec6867a",
+      "entity": "FocusSession",
+      "entityId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "action": "FOCUS_START",
+      "summary": "Portfolio/project; timed, user-confirmed deliberate work; rescue=false; application details are self-reported",
+      "timestamp": 1790962405480
+    },
+    {
+      "id": "0a7afd51-eb32-42a9-a3c9-a91a4ee4e282",
+      "entity": "FocusSession",
+      "entityId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "action": "FOCUS_PAUSE",
+      "summary": "Timed evidence; user action",
+      "timestamp": 1790962774319
+    },
+    {
+      "id": "bb7562ba-4b97-4450-8045-c776ec33d0a8",
+      "entity": "FocusSession",
+      "entityId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "action": "FOCUS_RESUME",
+      "summary": "Timed evidence; user action",
+      "timestamp": 1790963076595
+    },
+    {
+      "id": "998488cf-e607-4dc6-9940-086b5c6a261d",
+      "entity": "FocusSession",
+      "entityId": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "action": "FOCUS_STOP",
+      "summary": "Timed evidence; user action",
+      "timestamp": 1790963088432
+    },
+    {
+      "id": "47f02e84-f023-421c-aa54-f6ceac495c18",
+      "entity": "FocusSession",
+      "entityId": "6d9a0de5-f22d-47b9-8679-aedc3fc4c6fc",
+      "action": "FOCUS_START",
+      "summary": "Portfolio/project; timed, user-confirmed deliberate work; rescue=false; application details are self-reported",
+      "timestamp": 1790963162566
+    }
+  ]
+}

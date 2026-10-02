@@ -1,0 +1,26 @@
+[
+    {
+        "Suite":  "dev.better.app.domain.ExecutionTest",
+        "Tests":  2,
+        "Failures":  0,
+        "Errors":  0
+    },
+    {
+        "Suite":  "dev.better.app.domain.ReminderTest",
+        "Tests":  3,
+        "Failures":  0,
+        "Errors":  0
+    },
+    {
+        "Suite":  "dev.better.app.domain.SchedulingTest",
+        "Tests":  12,
+        "Failures":  0,
+        "Errors":  0
+    },
+    {
+        "Suite":  "dev.better.app.domain.TimeTest",
+        "Tests":  3,
+        "Failures":  0,
+        "Errors":  0
+    }
+]

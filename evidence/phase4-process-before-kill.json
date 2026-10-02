@@ -1,0 +1,46 @@
+{
+  "label": "tick",
+  "wall": "2026-10-02T17:46:24.454350Z",
+  "elapsed": 3241347,
+  "boot": 74,
+  "sessions": [
+    {
+      "id": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "state": "COMPLETED",
+      "millis": 380674,
+      "recovery": ""
+    },
+    {
+      "id": "6d9a0de5-f22d-47b9-8679-aedc3fc4c6fc",
+      "state": "RUNNING",
+      "millis": 21886,
+      "recovery": ""
+    }
+  ],
+  "segments": [
+    {
+      "session": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startElapsed": 2462372,
+      "startWall": 1790962405479,
+      "millis": 368838,
+      "candidate": null,
+      "closed": true
+    },
+    {
+      "session": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startElapsed": 3133488,
+      "startWall": 1790963076595,
+      "millis": 11836,
+      "candidate": null,
+      "closed": true
+    },
+    {
+      "session": "6d9a0de5-f22d-47b9-8679-aedc3fc4c6fc",
+      "startElapsed": 3219456,
+      "startWall": 1790963162562,
+      "millis": 21886,
+      "candidate": null,
+      "closed": false
+    }
+  ]
+}

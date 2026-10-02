@@ -1,0 +1,32 @@
+{
+  "label": "tick",
+  "wall": "2026-10-02T17:44:50.413631Z",
+  "elapsed": 3147307,
+  "boot": 74,
+  "sessions": [
+    {
+      "id": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "state": "COMPLETED",
+      "millis": 380674,
+      "recovery": ""
+    }
+  ],
+  "segments": [
+    {
+      "session": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startElapsed": 2462372,
+      "startWall": 1790962405479,
+      "millis": 368838,
+      "candidate": null,
+      "closed": true
+    },
+    {
+      "session": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startElapsed": 3133488,
+      "startWall": 1790963076595,
+      "millis": 11836,
+      "candidate": null,
+      "closed": true
+    }
+  ]
+}

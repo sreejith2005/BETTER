@@ -1,0 +1,24 @@
+{
+  "label": "tick",
+  "wall": "2026-10-02T17:34:47.254683Z",
+  "elapsed": 2544148,
+  "boot": 74,
+  "sessions": [
+    {
+      "id": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "state": "RUNNING",
+      "millis": 81765,
+      "recovery": ""
+    }
+  ],
+  "segments": [
+    {
+      "session": "d42cfc31-9701-4106-89d6-3e130590e2ad",
+      "startElapsed": 2462372,
+      "startWall": 1790962405479,
+      "millis": 81765,
+      "candidate": null,
+      "closed": false
+    }
+  ]
+}

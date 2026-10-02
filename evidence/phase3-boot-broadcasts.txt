@@ -1,0 +1,3 @@
+    bcast_core_defer_until_active=true 
+    bcast_core_defer_until_active=true 
+Action [android.intent.action.BOOT_COMPLETED]

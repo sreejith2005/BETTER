@@ -1,0 +1,3 @@
+List of devices attached
+[redacted]             device product:a55xnsins model:SM_A556E device:a55x transport_id:1
+
