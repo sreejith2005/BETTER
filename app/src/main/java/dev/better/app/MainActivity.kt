@@ -17,12 +17,14 @@ open class MainActivity : ComponentActivity() {
     protected open fun scheduleRepository(app: BetterApplication) = app.schedules
     protected open fun reminderRepository(app: BetterApplication) = app.reminders
     protected open fun focusRepository(app: BetterApplication) = app.focus
+    private var rescueRequest by mutableIntStateOf(0)
     private var reminderRequest by mutableStateOf<Pair<String, String>?>(null)
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         readReminder(intent)
     }
     private fun readReminder(intent: Intent) {
+        if (intent.getBooleanExtra("attentionRescue", false)) { rescueRequest++; intent.removeExtra("attentionRescue") }
         reminderRequest = intent.getStringExtra("deliveryId")?.let { it to (intent.getStringExtra("reminderAction") ?: "OPEN") }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +54,7 @@ open class MainActivity : ComponentActivity() {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T = CareerViewModel(focusRepo) as T
             })
-            BetterRoot(model, app.clock, schedules, career)
+            BetterRoot(model, app.clock, schedules, career, rescueRequest)
         }
     }
 }

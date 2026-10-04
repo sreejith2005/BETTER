@@ -1,0 +1,7 @@
+﻿
+10-04 23:04:10.082 25234 25406 I System.out: USAGE_DEVICE permission=true selected=com.instagram.android 
+observedAt=1791135249898 totalMillis=20206790 state=Android foreground events; observed, not proof of attention
+10-04 23:06:47.698 26410 26431 I System.out: USAGE_DEVICE permission=true selected=com.instagram.android 
+observedAt=1791135407554 totalMillis=20206790 state=Android foreground events; observed, not proof of attention
+
+

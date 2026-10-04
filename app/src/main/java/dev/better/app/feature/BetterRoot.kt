@@ -29,6 +29,7 @@ import dev.better.app.feature.plan.ScheduleScreen
 import dev.better.app.feature.plan.TodayExecution
 import dev.better.app.feature.plan.ReviewExecution
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.lifecycle.repeatOnLifecycle
 import java.time.LocalTime
 import java.time.ZoneId
@@ -40,12 +41,12 @@ private val lightPalette = lightColorScheme(
     background = Color(0xFFF6F5EF), surface = Color(0xFFF6F5EF),
     surfaceVariant = Color(0xFFE9EAE2), onSurface = Color(0xFF1C2924),
 )
-private val darkPalette = darkColorScheme(primary = Color(0xFFA5D4B9),
+private val darkPalette = darkColorScheme(primary = Color(0xFFA5D4B9), onPrimary = Color(0xFF123B2A),
     background = Color(0xFF111C18), surface = Color(0xFF111C18),
     primaryContainer = Color(0xFF254C3D), onPrimaryContainer = Color(0xFFD8E9DF))
 
 @Composable
-fun BetterRoot(model: AppViewModel, clock: AppClock, schedules: ScheduleViewModel? = null, career: CareerViewModel? = null) {
+fun BetterRoot(model: AppViewModel, clock: AppClock, schedules: ScheduleViewModel? = null, career: CareerViewModel? = null, rescueRequest: Int = 0) {
     val state by model.state.collectAsStateWithLifecycle()
     val dark = when (state.theme) { "Dark" -> true; "Light" -> false; else -> isSystemInDarkTheme() }
     MaterialTheme(colorScheme = if (dark) darkPalette else lightPalette) {
@@ -53,7 +54,7 @@ fun BetterRoot(model: AppViewModel, clock: AppClock, schedules: ScheduleViewMode
             when {
                 state.loading -> Box(Modifier.safeDrawingPadding().padding(24.dp)) { Text("Opening your local plan…") }
                 state.settings == null -> Onboarding(state, model::onboard, clock.zone().id)
-                else -> Home(state, model::setTheme, clock, schedules, career)
+                else -> Home(state, model::setTheme, clock, schedules, career, rescueRequest)
             }
         }
     }
@@ -103,11 +104,14 @@ private fun TimeField(label: String, value: String, onChange: (String) -> Unit) 
 }
 
 @Composable
-private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, schedules: ScheduleViewModel?, career: CareerViewModel?) {
+private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, schedules: ScheduleViewModel?, career: CareerViewModel?, rescueRequest: Int = 0) {
     var selected by rememberSaveable { mutableStateOf("Today") }
+    LaunchedEffect(rescueRequest) { if (rescueRequest > 0) selected = "Today" }
+    var adaptive by rememberSaveable { mutableStateOf(false) }
     val reminderFocus = schedules?.reminderFocus?.collectAsStateWithLifecycle()?.value
-    LaunchedEffect(reminderFocus) { if (reminderFocus != null) selected = "Plan" }
+    LaunchedEffect(reminderFocus) { if (reminderFocus != null) { adaptive = false; selected = "Plan" } }
     val pageScroll = rememberScrollState()
+    val pageScope = rememberCoroutineScope()
     LaunchedEffect(selected) { pageScroll.scrollTo(0) }
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current
@@ -132,7 +136,7 @@ private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, s
     val day = remember(tick, settings) { operationalDate(clock.now(), if (settings.timezonePolicy == "LOCAL_FLOATING") clock.zone() else ZoneId.of(settings.zoneId), LocalTime.parse(settings.dayBoundary)) }
     val standard = state.standards.lastOrNull { it.effectiveDate <= day.toString() }
     Scaffold(floatingActionButton = {
-        if (schedules != null) FloatingActionButton(onClick = { selected = "Plan"; schedules.create() }) { Text("+ Add") }
+        if (schedules != null) FloatingActionButton(onClick = { adaptive = false; selected = "Plan"; schedules.create() }) { Text("+ Add") }
     }, bottomBar = {
         NavigationBar {
             listOf("Today", "Plan", "Review", "Settings").forEachIndexed { index, tab ->
@@ -146,8 +150,9 @@ private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, s
             Text(selected, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.SemiBold)
             when (selected) {
                 "Today" -> {
-                    Text("Local profile · Normal mode", style = MaterialTheme.typography.bodyMedium)
-                    if (career != null) CareerToday(career, day) else Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer), modifier = Modifier.fillMaxWidth()) {
+                    if (schedules != null) AdaptiveSummary(schedules, day.toString()) else Text("Local profile · Normal mode")
+                    if (schedules != null) OutlinedButton({ adaptive = true; selected = "Plan" }) { Text("Routines / Day override") }
+                    if (career != null) CareerToday(career, day, rescueRequest) else Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer), modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Text("DAILY STANDARD", style = MaterialTheme.typography.labelMedium)
                             Text("Career Focus", style = MaterialTheme.typography.titleLarge)
@@ -160,10 +165,13 @@ private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, s
                     Text(if (notificationsEnabled) "Notifications allowed · timing is best effort" else "Notifications are off · your local plan is available", style = MaterialTheme.typography.bodyMedium)
                     if(schedules?.reminders != null) ReminderSummary(schedules)
 
-                    if(schedules!=null) TodayExecution(schedules,day) {selected="Plan"}
+                    if(schedules!=null) TodayExecution(schedules,day) {adaptive=false;selected="Plan"}
                 }
                 "Plan" -> {
-                    if (schedules != null) ScheduleScreen(schedules) else {
+                    if (schedules != null) {
+                        OutlinedButton({ adaptive = !adaptive }) { Text(if (adaptive) "Commitments" else "Routines and adaptive day") }
+                        if (adaptive) AdaptiveScreen(schedules) { pageScope.launch { pageScroll.scrollTo(0) } } else ScheduleScreen(schedules)
+                    } else {
                     Text("Career Focus", style = MaterialTheme.typography.titleLarge)
                     Text("Daily standard · ${(standard?.targetSeconds ?: 1800) / 60} minutes")
                     Text("Preferred window ${settings.careerStart}–${settings.careerEnd}")
@@ -175,6 +183,7 @@ private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, s
                     if(schedules!=null) ReviewExecution(schedules,day) else Text("Today · In progress")
                 }
                 "Settings" -> {
+                    (context.applicationContext as? dev.better.app.BetterApplication)?.let { OwnershipSettings(it) }
                     if (career != null) CareerSettings(career, day)
                     Text("Stored on this phone", style = MaterialTheme.typography.titleLarge)
                     Text("Day begins ${settings.dayBoundary}\nTimezone ${settings.zoneId}\nWork ${settings.workStart}–${settings.workEnd}\nQuiet hours ${settings.quietStart}–${settings.quietEnd}")
@@ -185,8 +194,7 @@ private fun Home(state: AppState, setTheme: (String) -> Unit, clock: AppClock, s
                     Text(if (notificationsEnabled) "Notifications allowed" else "Notifications are off")
                     OutlinedButton(onClick = { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }) { Text("Notification settings") }
                     if(schedules?.reminders != null) ReminderSettings(schedules, settings)
-                    Text("Usage Access is not requested. No analytics, internet permission or automatic cloud backup.")
-                    Text("BETTER · Career preview 0.5.0", style = MaterialTheme.typography.bodySmall)
+                    Text("BETTER · Attention and data ownership 0.7.0", style = MaterialTheme.typography.bodySmall)
                 }
             }
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }

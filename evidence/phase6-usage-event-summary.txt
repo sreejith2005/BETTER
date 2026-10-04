@@ -1,0 +1,5 @@
+﻿
+10-04 18:31:09.205  6588  6607 I System.out: USAGE_DIAGNOSTIC selected-package event counts={2=263, 1=262, 23=239, 
+19=7, 20=7, 11=4} firstType=2 lastType=23 unmatchedPauses=1 openActivities=0
+
+

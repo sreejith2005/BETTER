@@ -9,7 +9,8 @@ class BetterApplication : Application() {
     val clock by lazy { AndroidClock() }
     val database by lazy { BetterDatabase.open(this) }
     val repository by lazy { LocalRepository(database, clock) }
-    val preferences by lazy { UiPreferences(this) }
+    val preferences by lazy { UiPreferences(this, database) }
+    val attention by lazy { dev.better.app.platform.AndroidAttention(this) }
     val focus by lazy { FocusRepository(database, clock, { android.provider.Settings.Global.getInt(contentResolver, android.provider.Settings.Global.BOOT_COUNT, -1) }) }
     private val focusScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
     val schedules: ScheduleRepository by lazy { ScheduleRepository(database, clock).also { repo -> repo.onChanged = { reminders.reconcile() } } }

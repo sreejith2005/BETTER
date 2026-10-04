@@ -1,0 +1,5 @@
+﻿
+10-04 23:03:32.455 24994 25012 I System.out: USAGE_PAIRING noStopMissingToday=0 noStopOpen=1 missingWithOther=0 
+packageMissingToday=0 packageOpen=true
+
+

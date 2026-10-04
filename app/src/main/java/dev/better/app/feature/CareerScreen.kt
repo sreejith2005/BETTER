@@ -48,13 +48,14 @@ class CareerViewModel(val repository: FocusRepository) : ViewModel() {
 fun focusTime(millis: Long): String = "${millis / 60000}:${(millis / 1000 % 60).toString().padStart(2, '0')}"
 
 @Composable
-fun CareerToday(model: CareerViewModel, day: LocalDate) {
+fun CareerToday(model: CareerViewModel, day: LocalDate, rescueRequest: Int = 0) {
     val state by model.state.collectAsStateWithLifecycle()
     val busy by model.busy.collectAsStateWithLifecycle()
     val error by model.error.collectAsStateWithLifecycle()
     val today = state.dailyMillis[day] ?: 0
     val target = state.target(day)
     var starting by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(rescueRequest) { if (rescueRequest > 0) starting = "Rescue" }
     var activity by rememberSaveable { mutableStateOf("Search") }
     var confirmed by rememberSaveable { mutableStateOf(false) }
     var company by rememberSaveable { mutableStateOf("") }

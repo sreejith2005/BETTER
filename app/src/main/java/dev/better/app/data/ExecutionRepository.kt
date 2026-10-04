@@ -119,10 +119,18 @@ private fun OccurrenceRecord.json() = JSONObject().put("id", id).put("commitment
     .put("closesAt", closesAt).put("zoneId", zoneId).put("resolution", resolution).put("state", state)
     .put("actualAt", actualAt ?: JSONObject.NULL).put("reason", reason ?: JSONObject.NULL).put("acted", acted)
     .put("delivered", delivered).put("completedLate", completedLate)
+    .put("profileVersionId", profileVersionId ?: JSONObject.NULL).put("modeActivationId", modeActivationId ?: JSONObject.NULL)
+    .put("dayOverrideId", dayOverrideId ?: JSONObject.NULL).put("blockDurationSeconds", blockDurationSeconds ?: JSONObject.NULL)
+    .put("blockFixed", blockFixed ?: JSONObject.NULL)
 private fun JSONObject.occurrence() = OccurrenceRecord(getString("id"),getString("commitmentId"),getString("versionId"),
     getString("plannedDate"),getString("operationalDate"),getLong("startAt"),getLong("endAt"),getLong("closesAt"),getString("zoneId"),
     getString("resolution"),getString("state"),if(isNull("actualAt")) null else getLong("actualAt"),
-    if(isNull("reason")) null else getString("reason"),getBoolean("acted"),getBoolean("delivered"),getBoolean("completedLate"))
+    if(isNull("reason")) null else getString("reason"),getBoolean("acted"),getBoolean("delivered"),getBoolean("completedLate"),
+    optString("profileVersionId").takeIf { has("profileVersionId") && !isNull("profileVersionId") },
+    optString("modeActivationId").takeIf { has("modeActivationId") && !isNull("modeActivationId") },
+    optString("dayOverrideId").takeIf { has("dayOverrideId") && !isNull("dayOverrideId") },
+    if(has("blockDurationSeconds") && !isNull("blockDurationSeconds")) getInt("blockDurationSeconds") else null,
+    if(has("blockFixed") && !isNull("blockFixed")) getBoolean("blockFixed") else null)
 private fun OverrideRecord.json() = JSONObject().put("id",id).put("occurrenceId",occurrenceId).put("title",title)
     .put("instructionText",instructionText).put("sourceText",sourceText).put("reason",reason).put("createdAt",createdAt).put("originalStart",originalStart)
 private fun JSONObject.override() = OverrideRecord(getString("id"),getString("occurrenceId"),getString("title"),getString("instructionText"),

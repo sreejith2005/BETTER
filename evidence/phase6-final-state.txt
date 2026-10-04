@@ -1,0 +1,10 @@
+﻿GET_USAGE_STATS: ignore; time=+5m17s173ms ago
+0
+Wifi is enabled
+
+    versionCode=7 minSdk=26 targetSdk=36
+    versionName=0.7.0-phase6
+        android.permission.POST_NOTIFICATIONS: granted=false, flags=[ 
+USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+

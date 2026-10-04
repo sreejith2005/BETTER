@@ -1,5 +1,66 @@
 # Implementation decisions
 
+## 2026-10-03 — Phase 5 routines and adaptive day
+
+- Room v5 uses explicit migration 4→5 and retains all earlier migrations. It adds
+  `adaptive_records` (immutable format-1 routine/profile versions, assignments,
+  routine links, mode activations and day overrides) and `routine_runs`. Logical
+  entities share a typed snapshot table; repository transactions validate their
+  references. It also adds nullable occurrence provenance and block duration/fixed
+  snapshots. Old occurrence columns, Career and reminder records are unchanged.
+- Routine steps use their version's ordered indices as stable step identities.
+  Each run snapshots its exact title/order/text and records completed/skipped
+  results; append-only step actions carry timestamps. Reopening resumes the same
+  run. Completing a routine does not silently complete its scheduled occurrence.
+- Routine/profile edits append a later effective date (tomorrow or later). A new
+  identity can start today. Assignment and policy changes may start today but
+  never rewrite already due, delivered, acted or resolved records. Future
+  unacted suppression remains recalculable until its scheduled start; after that,
+  it remains suppressed history, never missed. Dates are calendar dates as in 05.
+- Precedence is base → profile → latest explicitly activated mode → day override
+  → occurrence override → recorded state. Explicit Keep restores base timing;
+  unspecified items inherit the preceding layer. Keep essential only restores
+  essential items unless individually changed. Normal is an empty special policy
+  for its date range, replacing earlier modes on those dates.
+- A one-off profile assignment wins over weekday assignment for that date;
+  otherwise the latest applicable weekday assignment wins. Profile versions are
+  selected by effective date. Linked blocks reuse occurrence IDs, snapshot their
+  duration/fixed flag, and cannot make an existing fixed commitment flexible.
+  Unlinked blocks are proposed timeline intervals, without duplicate obligations.
+  A routine-linked block also selects its scheduled commitment for run identity.
+- Moves propose a start within the original allowed window. Fixed items never
+  move automatically. Out-of-window or ambiguous DST proposals retain the earlier
+  plan and visibly explain that an explicit occurrence edit is needed. No medical
+  instruction text is changed or inferred. Per-item changes are explicit.
+- Fixed profile blocks also retain their proposed start against later mode moves
+  or Keep policies. Overnight-window moves resolve on the following calendar date
+  where appropriate. A future completion-anchored suppression is excluded from
+  terminal-chain selection until it is protected, keeping repeated reconciliation
+  stable and allowing an explicit replacement policy to restore it before due.
+- Routine start logs against both the run and its occurrence. Undo of an earlier
+  move cannot rewrite a subsequently started run's occurrence history. Nullable
+  profile/mode/day fields round-trip through execution snapshots; old format-1
+  snapshots without those fields still parse.
+- After the owner's offline review, preview cards, plain state labels, dark button
+  contrast and editor scroll reset were improved. Full redesign remains deferred.
+- A later preservation comparison allows an original PLANNED reminder to become
+  MISSED only after its scheduled time, including the accompanying detail text.
+  All other original reminder fields remain exact. The immediate migration
+  comparison and the final comparison both passed 229 original rows.
+- Preview covers up to 45 days from the effective date, including dates beyond
+  today's materialized horizon. Completion-anchored rules show only their next
+  known occurrence. Preview/save compare authoritative state and run in a Room
+  transaction; overlap retention and overlapping mode replacement need explicit
+  acknowledgement. Saving triggers the existing reminder reconciliation.
+- The pre-update DB/WAL/SHM snapshot is private on the phone under
+  `files/phase5-preservation/`. Previous snapshots are untouched. Preservation
+  comparison reads a temporary private copy so SQLite cannot change the original
+  snapshot's shared-memory read marks. No personal database is exported to the PC.
+- Migration testing follows the existing exported-schema harness, checked against
+  the official [MigrationTestHelper reference](https://developer.android.com/reference/androidx/room/testing/MigrationTestHelper).
+  Dependencies and permissions are unchanged. Phase 6, release packaging and full
+  visual redesign remain out of scope; request Pinterest references after Phase 6.
+
 ## 2026-10-02 — Phase 4 Career/Rescue
 
 - Room v4 adds focus sessions and segments through explicit migration 3→4.
@@ -215,3 +276,111 @@ No release APK is authorized before all gates.
   invalidated first reboot was repeated; boot 74 recovered automatically.
 - Record observed timing honestly: actual posting was 80.095 seconds late and
   reboot recovery was delayed several minutes. No immediate-delivery guarantee.
+
+## 2026-10-04 — Phase 6 implementation and verification decisions
+
+- Add Room v6 with explicit 5→6 migration: attention_settings and attention_attempts.
+  Preserve all existing tables/columns, migrations and phone-private snapshots.
+- Attention is opt-in as well as permission-gated. Selected-package raw events
+  are used transiently for foreground intervals, then discarded. A bounded
+  24-hour lookback reconstructs carry-in sessions; totals are clipped to today
+  and eligible overnight windows. Package RESUMED/PAUSED pairs are used because
+  class names do not identify activity instances and STOPPED can arrive late.
+  Ambiguous multi-resume streams remain unavailable rather than double-counted.
+  Missing events, an incomplete boundary/session, locked storage or revoked access
+  are unavailable, not zero. Observations expire after two minutes for decisions.
+- Editable eligible, office and commute windows; default office exclusion is
+  09:00–18:00, inherited from configured work hours. No commute duration is
+  invented: exclusions are blank until entered. Configured mode titles can suppress
+  Attention. Quiet hours and running/complete Career suppress it independently.
+- One claim per eligible window, minimum 60-minute cooldown, maximum two per
+  operational day. Claims are committed before posting; a crash is not retried.
+  POSTED means Android post request, not user observation. No blocking/overlay.
+- Existing best-effort WorkManager checks and foreground Attention refresh sample
+  usage. This cannot promise intervention while Instagram is still foreground:
+  an unclosed usage interval is conservatively unavailable until Android supplies
+  a complete interval. Android/OEM delays remain visible limits.
+- Archive format 1 / Room 6 is full replacement after preview, never merge.
+  Validate typed rows, schema, primary/foreign keys and domain references in a
+  separate temporary phone database before one transaction replaces the target.
+  Reject stale previews. Preserve row order for chronological tie-breaking.
+  Exclude permission grants and platform notification IDs; rebuild future alerts.
+- Export/import requires any Career timer to be finished. This avoids restoring
+  stale monotonic/boot markers as active work. Completed sessions and exact
+  recorded segments round-trip. External archives are readable, user-selected
+  files outside app control; local destinations are recommended for offline use.
+- Delete requires an exact confirmation phrase. Delete domain rows only, never
+  preservation directories or external files. AT-29 deletion uses a separately
+  named synthetic database exclusively; the personal database is not exported to PC.
+- Theme joins the archived settings transaction; legacy DataStore remains a
+  fallback until the Room setting exists. The strengthened archive fixture fills
+  every one of the 15 tables, including overrides, reminder and Attention evidence.
+- The owner completed the actual offline SAF synthetic round trip and reported
+  PASS / Every table matches. Granted usage was observed in the installed UI with
+  selected package and timestamp. Owner revocation showed Unavailable in the UI
+  and null in the actual adapter test. Final combined phone run passed 77/77;
+  host tests passed 35/35. Owner restored Opt in off after testing.
+- Preservation permits a pending reminder to become BLOCKED only after its due
+  time while notifications are disabled, with the exact unavailable-notifications
+  reason and all attempted/posted/observed timestamps still null. Other original
+  fields remain exact. This is normal live-clock behavior, not migration loss.
+- Android official references rechecked during implementation:
+  https://developer.android.com/reference/android/app/usage/UsageStatsManager
+  https://developer.android.com/training/data-storage/shared/documents-files
+- Phase 6 is complete within `evidence/phase6-checklist.md` coverage. Controlled
+  clocks establish policy timing; no real daily Attention soak or manual Attention
+  notification delivery/tap is claimed. AT-30 offline behavior and the local-only
+  manifest/dependency baseline are verified; no packet/network-log trace was taken.
+  No Phase 7, full redesign or release APK is included. Request Pinterest references
+  and stop; do not begin visual work without a new instruction.
+
+## 2026-10-04 — Owner feedback and next-chat UI/UX rebuild
+
+This entry follows the Phase 6 stop and records the owner's NEW request to prepare
+the next chat. It does not start redesign implementation in this chat or Phase 7.
+
+- The owner manually tested BETTER and could not understand its purpose, any of
+  the displayed features, or how to use it. Existing automated functional passes
+  are retained but are not evidence of usability. Comprehension is a blocking
+  product problem before any marketing ambitions.
+- Rebuild information architecture, navigation, interaction flows, terminology,
+  hierarchy and presentation as needed. Do not limit the work to a cosmetic skin.
+  Preserve verified domain behavior and existing personal data while changing how
+  users discover and operate features.
+- Explicit complaints: overwhelming quantities of text/information, little reason
+  to read it, and very long pages requiring repeated scrolling. Use concise visible
+  explanations, clear primary actions, focused screens and on-demand detail. Keep
+  capabilities discoverable; hiding everything behind unlabeled icons is not a fix.
+- Visual intent: clean but NOT minimalistic; creative, immersive and expressive.
+  The desired emotional experience is encouragement and a manageable sense of
+  making life a little better. Do not equate clean with sparse/generic, or expressive
+  with clutter, excessive animation, guilt or childish gamification.
+- Initially design for this owner, not hypothetical market segments. Future age
+  questions, demographic collection, age-dependent experiences and Play Store
+  marketing are ideas only and remain deferred. The suggested age ranges are not
+  a validated model of user ability; any later adaptation should consider expressed
+  preferences and accessibility needs instead of assuming ability from age.
+- The owner will supply multiple Pinterest references with notes on particular
+  liked parts. None is a complete target design. Maintain a reference-to-preference
+  record HERE, identifying what is explicit, inferred, unresolved or rejected.
+  Wait for the owner to finish the reference batch before committing a direction.
+  A missing/inaccessible reference must not be imagined or treated as inspected.
+- Next-chat sequence: read source specs/current handoff and Phase 6 limits; inspect
+  current journeys; gather references; synthesize a coherent design and navigation
+  with representative reviewable screens; then implement the agreed direction in
+  Compose and validate on the USB phone. A review checkpoint must show concrete
+  work, not ask approval for an abstract plan. Avoid fragmented new planning docs.
+- Validation must include owner task walkthroughs and plain-language comprehension:
+  can the owner explain BETTER's purpose, identify the next action, and complete
+  everyday actions without agent coaching? Record observed difficulties and revise.
+  Separately run relevant automated regressions, data/snapshot checks, and basic
+  accessibility/navigation checks. Do not claim all usability is solved from a
+  screenshot or test count. Define measurable checks with the proposed journeys.
+- Preserve Career/Rescue, reminder semantics, scheduling previews, adaptive-day
+  precedence, versions/history, exact health instructions/Unconfirmed status,
+  opt-in Attention, archive integrity and offline local-only baseline. UI copy may
+  be simplified without changing medical text or disguising unavailable states.
+- Verify installed state before any update: last recorded dev.better.app debug
+  0.7.0-phase6 / code 7, Room 6. No uninstall/storage clear/destructive migration,
+  no personal DB export to PC, and no overwriting Phase 2–6 private snapshots.
+  Any destructive test uses isolated synthetic storage. No release APK or Phase 7.

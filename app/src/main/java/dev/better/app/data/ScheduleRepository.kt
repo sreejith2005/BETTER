@@ -134,11 +134,13 @@ class ScheduleRepository(val db: BetterDatabase, val clock: AppClock) {
         val rules = dao.rules().associateBy { it.id }
         val active = db.foundation().commitments().filter { it.archivedAt == null }.map { it.id }.toSet()
         val existing = dao.occurrences().associateBy { it.id }
+        val adaptive = AdaptiveSnapshot(db.adaptive().records())
         val retained = mutableSetOf<String>()
         for (v in dao.versions().filter { it.commitmentId in active }) {
             val rule = requireNotNull(rules[v.ruleId]).rule()
             val history = existing.values.filter { it.commitmentId == v.commitmentId }
-            val last = history.filter { OccurrenceState.valueOf(it.state) in terminalStates }.maxByOrNull { it.actualAt ?: it.startAt }
+            val last = history.filter { OccurrenceState.valueOf(it.state) in terminalStates &&
+                (it.state != "SKIPPED_BY_OVERRIDE" || it.protected(now.toEpochMilli())) }.maxByOrNull { it.actualAt ?: it.startAt }
             val from = if (rule.type == RuleType.ONE_OFF) minOf(today, rule.anchor) else today
             val plans = if (rule.type == RuleType.INTERVAL_COMPLETION) {
                 if (rule.count != null && history.count { it.state == "COMPLETED" } >= rule.count) emptyList()
@@ -158,14 +160,23 @@ class ScheduleRepository(val db: BetterDatabase, val clock: AppClock) {
                 // a future edit cannot generate a second obligation for that same date.
                 if (history.any { it.id != key && it.plannedDate == p.calendarDate.toString() && it.protected(now.toEpochMilli()) &&
                     (rule.type != RuleType.INTERVAL_COMPLETION || it.versionId != v.id || it.state != "COMPLETED") }) continue
-                dao.upsertOccurrence(OccurrenceRecord(key, v.commitmentId, v.id, p.calendarDate.toString(), p.operationalDate.toString(),
-                    start, p.end.toEpochMilli(), p.closesAt.toEpochMilli(), p.zone, p.resolution,
-                    derivedState(OccurrenceState.PENDING, p, now).name))
+                val result = adaptive.apply(p, v, LocalTime.parse(settings.dayBoundary))
+                val adapted = result.plan
+                val date = p.calendarDate.toString()
+                val profile = adaptive.profile(date)
+                val block = profile?.let { AdaptiveJson.blocks(it.payload).firstOrNull { b -> b.commitmentId == v.commitmentId } }
+                dao.upsertOccurrence(OccurrenceRecord(key, v.commitmentId, v.id, p.calendarDate.toString(), adapted.operationalDate.toString(),
+                    adapted.start.toEpochMilli(), adapted.end.toEpochMilli(), adapted.closesAt.toEpochMilli(), adapted.zone,
+                    (listOf(p.resolution) + result.notes).filter { it.isNotBlank() }.joinToString("\n"),
+                    if (result.suppressed) "SKIPPED_BY_OVERRIDE" else derivedState(OccurrenceState.PENDING, adapted, now).name,
+                    reason = result.reason.takeIf { it.isNotBlank() }, profileVersionId = profile?.id,
+                    modeActivationId = adaptive.mode(date)?.id, dayOverrideId = adaptive.day(date)?.id,
+                    blockDurationSeconds = block?.minutes?.times(60), blockFixed = block?.fixed))
             }
         }
         for (o in existing.values) {
             if (o.id !in retained && !o.protected(now.toEpochMilli())) dao.deletePending(o.id)
-            else {
+            else if (o.id !in retained || o.protected(now.toEpochMilli())) {
                 val state = derivedState(OccurrenceState.valueOf(o.state), o.plan(), now).name
                 if (state != o.state) dao.upsertOccurrence(o.copy(state = state))
             }
@@ -180,7 +191,7 @@ class ScheduleRepository(val db: BetterDatabase, val clock: AppClock) {
         val old = dao.occurrences().filter { it.commitmentId in active && it.commitmentId != excludeCommitment &&
             it.id != excludeOccurrence && OccurrenceState.valueOf(it.state) !in terminalStates }.map { o ->
             val v = versions.getValue(o.versionId)
-            OccupiedInterval(o.id, overrides[o.id]?.title ?: v.title, o.startAt, o.startAt + v.durationSeconds * 1000L, v.fixed)
+            OccupiedInterval(o.id, overrides[o.id]?.title ?: v.title, o.startAt, o.startAt + o.duration(v) * 1000L, o.fixed(v))
         }
         val proposed = plans.mapIndexed { i, p -> OccupiedInterval("preview:$i", "Proposed event", p.start.toEpochMilli(),
             p.start.toEpochMilli() + duration * 1000L, fixed) }

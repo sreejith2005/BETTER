@@ -1,0 +1,1 @@
+﻿PASS: All 12 phone-private snapshot files are byte-identical to the initial hashes.

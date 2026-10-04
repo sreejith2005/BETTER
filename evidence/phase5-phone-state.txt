@@ -1,0 +1,7 @@
+﻿Airplane mode:
+0
+Wi-Fi setting:
+1
+    versionCode=6 minSdk=26 targetSdk=36
+    versionName=0.6.0-phase5
+        android.permission.POST_NOTIFICATIONS: granted=false, flags=[ USER_SET|USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]

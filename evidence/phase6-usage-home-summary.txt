@@ -1,0 +1,9 @@
+﻿
+10-04 23:03:32.455 24994 25012 I System.out: USAGE_PAIRING noStopMissingToday=0 noStopOpen=1 missingWithOther=0 
+packageMissingToday=0 packageOpen=true
+10-04 23:04:10.081 25234 25406 I System.out: USAGE_PAIRING noStopMissingToday=0 noStopOpen=0 missingWithOther=0 
+packageMissingToday=0 packageOpen=false
+10-04 23:04:10.082 25234 25406 I System.out: USAGE_DEVICE permission=true selected=com.instagram.android 
+observedAt=1791135249898 totalMillis=20206790 state=Android foreground events; observed, not proof of attention
+
+

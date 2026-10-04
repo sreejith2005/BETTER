@@ -65,7 +65,7 @@ fun TodayExecution(model: ScheduleViewModel, day: LocalDate, openPlan: () -> Uni
     val today=items.filter {it.operationalDate==day.toString() || it.state in listOf("DUE","OVERDUE")}
     val intervals=today.filter {it.state in listOf("PENDING","DUE","OVERDUE")}.map {o->
         val v=data.versions.first {it.id==o.versionId}
-        OccupiedInterval(o.id,data.overrides.find {it.occurrenceId==o.id}?.title ?: v.title,o.startAt,o.startAt+v.durationSeconds*1000L,v.fixed)
+        OccupiedInterval(o.id,data.overrides.find {it.occurrenceId==o.id}?.title ?: v.title,o.startAt,o.startAt+o.duration(v)*1000L,o.fixed(v))
     }
     ConflictList(conflicts(intervals),model.repository.clock.zone().id)
     listOf("Due and overdue" to today.filter {it.state in listOf("DUE","OVERDUE")},
@@ -128,7 +128,7 @@ fun OccurrenceCard(model: ScheduleViewModel, data: PlanData, o: OccurrenceRecord
             Text(override?.title ?: v.title,style=MaterialTheme.typography.titleMedium)
             Text(stateLabel(o,v),color=MaterialTheme.colorScheme.primary)
             Text(readablePlan(o.plan()))
-            Text("${o.zoneId} · ${if(v.fixed) "Fixed" else "Flexible"} · ${v.durationSeconds/60} min",style=MaterialTheme.typography.bodySmall)
+            Text("${o.zoneId} · ${if(o.fixed(v)) "Fixed" else "Flexible"} · ${o.duration(v)/60} min",style=MaterialTheme.typography.bodySmall)
             if(v.category=="HEALTH") Text("Follow your clinician’s instructions.")
             (override?.instructionText ?: v.instructionText).takeIf {it.isNotBlank()}?.let {Text(it)}
             (override?.sourceText ?: v.sourceText).takeIf {it.isNotBlank()}?.let {Text("Source: $it",style=MaterialTheme.typography.bodySmall)}

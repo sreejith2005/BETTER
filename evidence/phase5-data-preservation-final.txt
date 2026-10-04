@@ -1,0 +1,1 @@
+﻿10-03 20:49:30.017 14856 14875 I System.out: PRESERVATION: 229 original rows checked across 11 tables; private snapshot remains on phone. Open occurrence states and expired PLANNED-to-MISSED reminder states may advance; other original fields remain exact.

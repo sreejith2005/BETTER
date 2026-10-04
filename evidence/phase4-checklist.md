@@ -1,6 +1,7 @@
 # Phase 4 — Career/Rescue report
 
-2026-10-02. **Phase 4 complete; AT-22–25 pass within the coverage below.**
+Phone gate recorded 2026-10-02; report finalized 2026-10-03.
+**Phase 4 complete; AT-22–25 pass within the coverage below.**
 Scope: Phase 4 only, AT-22–25 plus relevant regressions. No release APK.
 
 ## Implemented
@@ -47,7 +48,8 @@ unconfirmed recovery time. APK hash: `phase4-debug-apk-sha256.txt`.
 
 Phone: Samsung SM-A556E, Android 16/API 36, USB serial redacted.
 The live elapsed-time gate uses Flight mode on, Wi-Fi off, notifications denied.
-Automated storage/UI tests preceded that connectivity change.
+Initial storage/UI and regression tests preceded that connectivity change;
+the final 15 Career tests ran offline with notifications denied.
 
 ## Acceptance coverage
 

@@ -25,8 +25,8 @@
 | 2 Execution UI | Passed | 17 host + 28 phone tests; original data comparison; see phase2-checklist.md |
 | 3 Reminders | Passed | 20 host tests; 39 distinct phone tests; live actions/reboot; phase3-checklist.md |
 | 4 Career/Rescue | Passed | 25 host tests; 54 distinct phone tests; live background/pause/process/reboot; phase4-checklist.md |
-| 5 Adaptive day | Not started | — |
-| 6 Attention/data | Not started | — |
+| 5 Adaptive day | Passed | 31 host + 68 physical-phone tests; preservation and offline owner review; phase5-checklist.md |
+| 6 Attention/data | Complete within reported coverage | 35 host + 77 phone tests; actual denied/granted/revoked access and offline synthetic SAF round trip; see phase6-checklist.md for limits |
 | 7 Hardening | Not started | Full acceptance matrix pending |
 
 No release APK produced. Phase-scoped acceptance is recorded below; full V1
@@ -140,6 +140,8 @@ Phase 2 is complete. See `phase2-checklist.md` for scope and limitations.
 
 ## Phase 4 gate closed — 2026-10-02
 
+Report and handoff finalized 2026-10-03.
+
 Phase 4 is complete; AT-22–25 pass within `phase4-checklist.md` coverage.
 Debug 0.5.0-phase4 (code 5), Room v4, installed in place with explicit 3→4
 migration. All 221 original rows across nine tables passed preservation; all
@@ -157,3 +159,76 @@ Synthetic timer fixture removed; normal app relaunched. Final Flight mode off,
 Wi-Fi on, notifications denied. HANDOFF.md updated. Stop after the Phase 4 report;
 Phase 5 not started and no release APK produced. Full visual redesign stays after
 Phase 6, when Pinterest references will be requested.
+
+## Phase 5 gate closed — phone gate 2026-10-03, report 2026-10-04
+
+Phase 5 is complete; AT-16–21 pass within `phase5-checklist.md` coverage.
+Debug 0.6.0-phase5 (code 6), Room v5, installed in place with explicit 4→5
+migration. Routines/runs, profile versions and assignments, Life Modes, one-day
+overrides and overlap previews are implemented. Historical integrity, modifier
+precedence and suppressed-not-missed behavior pass, including completion-anchored
+suppression and execution undo after routine start.
+
+Final 31 host tests and 68/68 physical-phone tests pass. Debug app/test builds
+and lint pass (0 errors, 14 existing notices). The original 229 rows across 11
+tables passed preservation. All 12 private snapshot files across Phases 2–5 are
+byte-identical. A late PLANNED→MISSED reminder transition is explicitly accounted
+for; original reminder identity, timing and delivery evidence remain exact.
+
+Owner confirmed offline preview and basic readability, with improvement requested.
+Small card/contrast/scroll improvements followed and were checked on the installed
+phone. A profile UI timeout did not reproduce in an isolated retry or the full
+68-test rerun; its cause remains unproven and all logs are retained.
+
+Normal Today was restored with Career/Rescue and the 30-minute target. Last
+verified 2026-10-03: Flight mode off, Wi-Fi on, notifications denied. No personal
+adaptive change was saved for testing. No uninstall, storage reset, personal DB
+export or release APK. HANDOFF.md and decisions updated. Stop after Phase 5;
+Phase 6 remains unstarted. Request Pinterest references after Phase 6.
+
+## Phase 6 report complete — 2026-10-04
+
+Attention and data ownership are implemented in debug 0.7.0-phase6 / code 7,
+Room 6, installed in place with explicit migration 5→6. Full report:
+`phase6-checklist.md`; manual steps: `phase6-phone-steps.md`.
+
+Final 35/35 host tests and 77/77 physical-phone tests pass. Debug builds pass;
+lint reports 0 errors and 14 existing warnings. Controlled-clock tests cover
+intervention timing/exclusions/caps and Career suppression. Actual denied,
+granted and revoked Usage Access were observed. Owner completed offline synthetic
+SAF export/delete/preview/restore and confirmed every table matches. The automated
+archive fixture fills all 15 tables and preserves next-ten scheduling previews.
+Health UI retains exact entered text and Unconfirmed status.
+
+All 239 original rows across 13 tables pass final preservation comparison, allowing
+only established clock progression and the narrowly validated pending-to-BLOCKED
+reminder transition. All 15 Phase 2–6 snapshot hashes remain identical. No live
+deletion, personal database export to PC, uninstall, storage clear or destructive
+migration occurred. Earlier diagnostic failures and the intermittent profile UI
+timeout are retained; that UI suite and the final combined run passed.
+
+Offline operation and no-INTERNET/no-analytics baseline are verified. AT-30's
+network-log subcheck was not performed; no packet capture or real daily Attention
+notification soak is claimed. See the report for remaining device coverage limits.
+
+Normal BETTER was relaunched. Final phone state: Flight mode off, Wi-Fi on,
+notifications denied, Usage Access revoked, Opt in unticked and saved (owner
+confirmation plus final UI XML). HANDOFF and recorded decisions updated.
+Stop after this report and requesting Pinterest references. No Phase 7,
+full redesign or release APK.
+
+## Next-chat preparation — owner usability feedback, 2026-10-04
+
+After the Phase 6 report, the owner independently tried the app and reported being
+unable to understand its purpose or features. Text overload and long scrolling
+pages were explicit problems. This feedback is recorded separately from the passed
+functional gate: usability has not been accepted.
+
+Prepared HANDOFF.md and the existing decisions document for a dedicated UI/UX
+rebuild in a new chat. Direction: clean, creative, expressive, non-minimalistic,
+encouraging and initially tailored to the owner. Pinterest references will supply
+individual liked elements, not one complete target. Reference intake and concrete
+design review precede broad implementation; owner phone walkthroughs are required.
+Age-based personalization/demographic collection and marketing remain deferred.
+No app code, phone data, installation or design implementation changed in this
+preparation turn. Phase 7 and release packaging remain out of scope.

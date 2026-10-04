@@ -49,10 +49,14 @@ data class OccurrenceRecord(
     val closesAt: Long, val zoneId: String, val resolution: String,
     val state: String = "PENDING", val actualAt: Long? = null, val reason: String? = null,
     val acted: Boolean = false, val delivered: Boolean = false, val completedLate: Boolean = false,
+    val profileVersionId: String? = null, val modeActivationId: String? = null, val dayOverrideId: String? = null,
+    val blockDurationSeconds: Int? = null, val blockFixed: Boolean? = null,
 ) {
+    fun duration(version: VersionRecord) = blockDurationSeconds ?: version.durationSeconds
+    fun fixed(version: VersionRecord) = version.fixed || blockFixed == true
     fun plan() = PlannedOccurrence(LocalDate.parse(plannedDate), LocalDate.parse(operationalDate),
         Instant.ofEpochMilli(startAt), Instant.ofEpochMilli(endAt), Instant.ofEpochMilli(closesAt), zoneId, resolution)
-    fun protected(now: Long) = acted || delivered || state != "PENDING" || startAt <= now
+    fun protected(now: Long) = acted || delivered || state !in listOf("PENDING", "SKIPPED_BY_OVERRIDE") || startAt <= now
 }
 
 @Entity(tableName = "occurrence_overrides", foreignKeys = [
@@ -82,5 +86,5 @@ interface ScheduleDao {
     @Upsert suspend fun upsertOverride(override: OverrideRecord)
     @Query("DELETE FROM occurrence_overrides WHERE occurrenceId = :id") suspend fun deleteOverride(id: String)
     @Query("DELETE FROM occurrences WHERE id = :id") suspend fun deleteExecutionChild(id: String)
-    @Query("DELETE FROM occurrences WHERE id = :id AND acted = 0 AND delivered = 0 AND state = 'PENDING'") suspend fun deletePending(id: String)
+    @Query("DELETE FROM occurrences WHERE id = :id AND acted = 0 AND delivered = 0 AND state IN ('PENDING', 'SKIPPED_BY_OVERRIDE')") suspend fun deletePending(id: String)
 }

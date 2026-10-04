@@ -3,6 +3,25 @@ package dev.better.app.data
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE occurrences ADD COLUMN profileVersionId TEXT")
+        db.execSQL("ALTER TABLE occurrences ADD COLUMN modeActivationId TEXT")
+        db.execSQL("ALTER TABLE occurrences ADD COLUMN dayOverrideId TEXT")
+        db.execSQL("ALTER TABLE occurrences ADD COLUMN blockDurationSeconds INTEGER")
+        db.execSQL("ALTER TABLE occurrences ADD COLUMN blockFixed INTEGER")
+        db.execSQL("""CREATE TABLE IF NOT EXISTS adaptive_records (
+            id TEXT NOT NULL PRIMARY KEY, kind TEXT NOT NULL, family TEXT NOT NULL, title TEXT NOT NULL,
+            fromDate TEXT NOT NULL, untilDate TEXT NOT NULL, payload TEXT NOT NULL, createdAt INTEGER NOT NULL)""")
+        db.execSQL("CREATE INDEX index_adaptive_records_kind ON adaptive_records(kind)")
+        db.execSQL("CREATE INDEX index_adaptive_records_family ON adaptive_records(family)")
+        db.execSQL("""CREATE TABLE IF NOT EXISTS routine_runs (
+            id TEXT NOT NULL PRIMARY KEY, occurrenceId TEXT NOT NULL, versionId TEXT NOT NULL, title TEXT NOT NULL,
+            steps TEXT NOT NULL, results TEXT NOT NULL, startedAt INTEGER NOT NULL, finishedAt INTEGER)""")
+        db.execSQL("CREATE UNIQUE INDEX index_routine_runs_occurrenceId ON routine_runs(occurrenceId)")
+    }
+}
+
 val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("""CREATE TABLE IF NOT EXISTS focus_sessions (
@@ -66,5 +85,18 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             createdAt INTEGER NOT NULL, originalStart INTEGER NOT NULL,
             FOREIGN KEY(occurrenceId) REFERENCES occurrences(id) ON UPDATE NO ACTION ON DELETE RESTRICT)""")
         db.execSQL("CREATE UNIQUE INDEX index_occurrence_overrides_occurrenceId ON occurrence_overrides(occurrenceId)")
+    }
+}
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""CREATE TABLE IF NOT EXISTS attention_settings (
+            id INTEGER NOT NULL PRIMARY KEY, enabled INTEGER NOT NULL, packageName TEXT NOT NULL,
+            thresholdMinutes INTEGER NOT NULL, windows TEXT NOT NULL, office TEXT NOT NULL,
+            commute TEXT NOT NULL, disabledModes TEXT NOT NULL, theme TEXT NOT NULL)""")
+        db.execSQL("""CREATE TABLE IF NOT EXISTS attention_attempts (
+            id TEXT NOT NULL PRIMARY KEY, day TEXT NOT NULL, windowKey TEXT NOT NULL,
+            attemptedAt INTEGER NOT NULL, observedAt INTEGER NOT NULL, usageMillis INTEGER NOT NULL,
+            packageName TEXT NOT NULL, result TEXT NOT NULL)""")
     }
 }

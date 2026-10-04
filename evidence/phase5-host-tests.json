@@ -1,0 +1,38 @@
+﻿[
+    {
+        "suite":  "dev.better.app.domain.AdaptiveDayTest",
+        "tests":  6,
+        "failures":  0,
+        "errors":  0
+    },
+    {
+        "suite":  "dev.better.app.domain.ExecutionTest",
+        "tests":  2,
+        "failures":  0,
+        "errors":  0
+    },
+    {
+        "suite":  "dev.better.app.domain.FocusTest",
+        "tests":  5,
+        "failures":  0,
+        "errors":  0
+    },
+    {
+        "suite":  "dev.better.app.domain.ReminderTest",
+        "tests":  3,
+        "failures":  0,
+        "errors":  0
+    },
+    {
+        "suite":  "dev.better.app.domain.SchedulingTest",
+        "tests":  12,
+        "failures":  0,
+        "errors":  0
+    },
+    {
+        "suite":  "dev.better.app.domain.TimeTest",
+        "tests":  3,
+        "failures":  0,
+        "errors":  0
+    }
+]

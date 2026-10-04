@@ -73,8 +73,11 @@ interface FoundationDao {
 
 @Database(entities = [AppSettings::class, Commitment::class, CareerStandard::class, ActionLog::class,
     RuleRecord::class, VersionRecord::class, OccurrenceRecord::class, OverrideRecord::class,
-    ReminderDelivery::class, FocusSession::class, FocusSegment::class], version = 4, exportSchema = true)
+    ReminderDelivery::class, FocusSession::class, FocusSegment::class, AdaptiveRecord::class, RoutineRun::class,
+    AttentionSettings::class, AttentionAttempt::class], version = 6, exportSchema = true)
 abstract class BetterDatabase : RoomDatabase() {
+    abstract fun attention(): AttentionDao
+    abstract fun adaptive(): AdaptiveDao
     abstract fun focus(): FocusDao
     abstract fun foundation(): FoundationDao
     abstract fun schedules(): ScheduleDao
@@ -82,7 +85,7 @@ abstract class BetterDatabase : RoomDatabase() {
     companion object {
         // Version 1 is the initial schema. Each subsequent change must register
         // an explicit migration here and verify preservation with MigrationTestHelper.
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
         fun open(context: Context, name: String = "better.db"): BetterDatabase =
             Room.databaseBuilder(context, BetterDatabase::class.java, name)
                 .addMigrations(*MIGRATIONS).build()

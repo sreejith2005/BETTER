@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
+        <activity android:name=".probe.OwnershipProbeActivity" android:exported="true" android:label="BETTER synthetic archive test" />
         <activity android:name=".probe.FocusProbeActivity" android:exported="true" android:label="BETTER timer test" android:launchMode="singleTop" />
         <activity android:name=".probe.ReminderProbeActivity" android:exported="true" android:label="BETTER reminder test" android:launchMode="singleTop" />
         <receiver android:name=".probe.ReminderProbeReceiver" android:exported="false">

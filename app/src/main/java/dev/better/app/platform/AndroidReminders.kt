@@ -100,6 +100,7 @@ object ReminderWork {
 class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result = try {
         (applicationContext as BetterApplication).reminders.reconcile(inputData.getBoolean("recovery", false), inputData.getBoolean("deliver", false))
+        (applicationContext as BetterApplication).attention.sample()
         Result.success()
     } catch (e: kotlinx.coroutines.CancellationException) { throw e }
       catch (_: Exception) { if (runAttemptCount < 3) Result.retry() else Result.failure() }

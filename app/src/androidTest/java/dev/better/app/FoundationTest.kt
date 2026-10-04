@@ -64,9 +64,11 @@ class FoundationTest {
         @Suppress("DEPRECATION")
         val info = context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.GET_PERMISSIONS)
         val permissions = info.requestedPermissions.orEmpty().toSet()
-        listOf("android.permission.INTERNET", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_CALENDAR", "android.permission.PACKAGE_USAGE_STATS").forEach {
+        listOf("android.permission.INTERNET", "android.permission.QUERY_ALL_PACKAGES", "android.permission.READ_CALENDAR").forEach {
             assertFalse("Unexpected permission $it", permissions.contains(it))
         }
+        // Phase 6 adds optional, user-granted Usage Access; no broad package inventory.
+        assertTrue(permissions.contains("android.permission.PACKAGE_USAGE_STATS"))
         assertEquals(0, context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_ALLOW_BACKUP)
     }
 }

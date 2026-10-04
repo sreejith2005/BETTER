@@ -1,0 +1,8 @@
+﻿
+10-04 12:46:37.696 22417 22455 I System.out: USAGE_DEVICE permission=false selected=com.instagram.android 
+observedAt=1791098197693 totalMillis=null state=Usage Access denied or revoked
+10-04 12:46:38.024 22417 22455 I System.out: PRESERVATION: 239 original rows checked across 13 tables; private 
+snapshot remains on phone. Open occurrence states and expired PLANNED-to-MISSED reminder states may advance; other 
+original fields remain exact.
+
+

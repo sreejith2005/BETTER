@@ -1,0 +1,8 @@
+﻿
+
+Algorithm : SHA256
+Hash      : BA5FC23381B99F7A2DA3C577B89F88D4D5B36CCE305BEF5DED9EC1943E5F1116
+Path      : C:\Users\user\Downloads\BETTER\app\build\outputs\apk\debug\app-debug.apk
+
+
+

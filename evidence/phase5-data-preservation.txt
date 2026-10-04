@@ -1,0 +1,1 @@
+﻿10-03 14:58:20.833  1885  1949 I System.out: PRESERVATION: 229 original rows checked across 11 tables; private snapshot remains on phone.
